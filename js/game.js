@@ -18,12 +18,6 @@ gameScene.init = function() {
   this.enemyMaxY = 280;
   this.enemyMinY = 80;
 };
-// end the game
-gameScene.gameOver = function() {
- 
-    // restart the scene
-    this.scene.restart();
-};
 
 // load asset files for our game
 gameScene.preload = function() { 
@@ -52,10 +46,19 @@ gameScene.create = function() {
 
      // goal
   this.treasure = this.add.sprite(this.sys.game.config.width - 80, this.sys.game.config.height / 2, 'treasure');
-  this.treasure.setScale(0.6);
-
-
+    this.treasure.setScale(0.6);    
 };
+
+
+// end the game
+gameScene.gameOver = function() {
+    console.log("end of game");
+    this.player.x = 50;
+    //this.playerSpeed /= 10;
+    // restart the scene
+    //this.scene.restart();
+};
+
 
 // executed on every frame (60 times per second)
 gameScene.update = function() {
@@ -64,7 +67,7 @@ gameScene.update = function() {
   if (this.input.activePointer.isDown) {
         // check for active input
   
-      console.log('hi');
+      console.log('updating always the screen');
     // player walks
       this.player.x += this.playerSpeed;
   }
