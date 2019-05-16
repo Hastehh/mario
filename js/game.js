@@ -1,3 +1,9 @@
+// - animate the character
+// - further interactions with dragons
+// - up and down movement
+// - door into a new scene
+// - difficulty selection
+
 // create a new scene named "Game"
 let gameScene = new Phaser.Scene('Game');
 
@@ -5,25 +11,64 @@ let gameScene = new Phaser.Scene('Game');
 //////////////////////////////////////////////////
 // our game's configuration
 //////////////////////////////////////////////////
+
+let Menu = new Phaser.Scene('Load');
+
+Menu.init = function(){
+    let a = 1;
+};
+
+Menu.create = function(){
+
+    this.add.text(270,50, 'Press 1, 2 or 3', {font: '16px Courier'});
+
+    this.input.keyboard.once('keyup_TWO', function () {
+
+        this.scene.start('Game', {speed: 1.5});
+
+	    
+    }, this);
+};
+
+/*
+
+    //adding extra functions to normal game scene
+    Extends: Phaser.Scene,
+
+    initialize:
+
+    function Menu ()
+    {
+	Phaser.Scene.call(this, 'menu');
+    },
+
+    create: function()
+    {
+	this.add.text(320,50, 'Press 1, 2 or 3', {font: '16px Courier'});
+    }
+}
+*/
+
 let config = {
   type: Phaser.AUTO,  //Phaser will decide how to render our game (WebGL or Canvas)
   width: 640, // game width
   height: 360, // game height
-  scene: gameScene // our newly created scene
+    scene:  [Menu, gameScene] // our newly created scene
 };
 
 ////////////////////////////////////////////////// 
 // create the game, and pass it the configuration
 //////////////////////////////////////////////////
 let game = new Phaser.Game(config);
-
 //////////////////////////////////////////////////
 // some parameters for our scene (our own customer variables - these are NOT part of the Phaser API)
 //////////////////////////////////////////////////
-gameScene.init = function() {
-  this.playerSpeed = 1.5;
+gameScene.init = function(inputData) {
+    
+    this.playerSpeed = inputData.speed;
   this.enemyMaxY = 280;
-  this.enemyMinY = 80;
+    this.enemyMinY = 80;
+    console.log("etst");
 };
 
 //////////////////////////////////////////////////
@@ -31,6 +76,9 @@ gameScene.init = function() {
 //////////////////////////////////////////////////
 gameScene.preload = function() { 
   // load images
+    this.load.image('easy', 'assets/easyy.png');
+    this.load.image('medium','assets/mediumm.png');
+    this.load.image('hard','assets/hardd.png');
   this.load.image('background', 'assets/background.png');
   this.load.image('player', 'assets/player.png');
   this.load.image('dragon', 'assets/dragon.png');
@@ -41,6 +89,8 @@ gameScene.preload = function() {
 // executed once, after assets were loaded
 //////////////////////////////////////////////////
 gameScene.create = function() {  
+
+    this.cameras.main.resetFX();
 
     
     // background
@@ -84,6 +134,8 @@ gameScene.create = function() {
 
     //player is alive
     this.isPlayerAlive = true;
+    //resets camera
+    this.cameras.main.resetFX();
 };
 
 //////////////////////////////////////////////////
@@ -95,10 +147,15 @@ gameScene.gameOver = function() {
     this.isPlayAlive = false;
     
     console.log("end of game");
-    
+
     //shake camera
     this.cameras.main.shake(2000);
 
+    //fade camera
+    this.time.delayedCall(1000, function() {
+	this.cameras.main.fade(1000);
+    }, [], this);
+    
     //restart game
     this.time.delayedCall(2000, function() {
 	this.scene.restart();
@@ -119,6 +176,8 @@ gameScene.update = function() {
     let dragons = this.dragons.getChildren();
     let numDragons = dragons.length;
 
+
+   
     for (let i = 0; i < numDragons; i++) {
 
 	//move enemies
