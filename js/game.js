@@ -22,12 +22,24 @@ Menu.create = function(){
 
     this.add.text(270,50, 'Press 1, 2 or 3', {font: '16px Courier'});
 
+    this.input.keyboard.once('keyup_ONE', function () {
+
+        this.scene.start('Game', {speed: 1.2});
+	    
+    }, this);
+
     this.input.keyboard.once('keyup_TWO', function () {
 
         this.scene.start('Game', {speed: 1.5});
-
 	    
     }, this);
+
+    this.input.keyboard.once('keyup_THREE', function () {
+
+        this.scene.start('Game', {speed: 1.8});
+	    
+    }, this);
+    
 };
 
 /*
