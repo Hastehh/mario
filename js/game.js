@@ -4,83 +4,55 @@
 // - door into a new scene
 // - difficulty selection
 
-// create a new scene named "Game"
-let gameScene = new Phaser.Scene('Game');
-
-
 //////////////////////////////////////////////////
-// our game's configuration
+// creating the main menu
 //////////////////////////////////////////////////
-
 let Menu = new Phaser.Scene('Load');
 
 Menu.init = function(){
-    let a = 1;
 };
 
+//difficulty selection
 Menu.create = function(){
 
     this.add.text(270,50, 'Press 1, 2 or 3', {font: '16px Courier'});
 
     this.input.keyboard.once('keyup_ONE', function () {
 
-        this.scene.start('Game', {speed: 1.2});
-	    
+        this.scene.start('Gamescene_Darren', {dragonSpeedMenu: 0.5});
     }, this);
 
     this.input.keyboard.once('keyup_TWO', function () {
 
-        this.scene.start('Game', {speed: 1.5});
+        this.scene.start('Gamescene_Darren', {dragonSpeedMenu: 1.5});
 	    
     }, this);
 
     this.input.keyboard.once('keyup_THREE', function () {
 
-        this.scene.start('Game', {speed: 1.8});
+        this.scene.start('Gamescene_Darren', {dragonSpeedMenu: 5});
 	    
     }, this);
     
 };
 
-/*
+////////////////////////////////////////
+// creating game scence
+////////////////////////////////////////
+let gameScene = new Phaser.Scene('Gamescene_Darren');
 
-    //adding extra functions to normal game scene
-    Extends: Phaser.Scene,
-
-    initialize:
-
-    function Menu ()
-    {
-	Phaser.Scene.call(this, 'menu');
-    },
-
-    create: function()
-    {
-	this.add.text(320,50, 'Press 1, 2 or 3', {font: '16px Courier'});
-    }
-}
-*/
-
-let config = {
-  type: Phaser.AUTO,  //Phaser will decide how to render our game (WebGL or Canvas)
-  width: 640, // game width
-  height: 360, // game height
-    scene:  [Menu, gameScene] // our newly created scene
-};
-
-////////////////////////////////////////////////// 
-// create the game, and pass it the configuration
-//////////////////////////////////////////////////
-let game = new Phaser.Game(config);
-//////////////////////////////////////////////////
-// some parameters for our scene (our own customer variables - these are NOT part of the Phaser API)
-//////////////////////////////////////////////////
 gameScene.init = function(inputData) {
-    
-    this.playerSpeed = inputData.speed;
-  this.enemyMaxY = 280;
+    this.playerSpeed = 1.5;
+    this.dragonSpeed = inputData.dragonSpeedMenu;
+    this.enemyMaxY = 280;
     this.enemyMinY = 80;
-    console.log("etst");
+
+    this.keys = this.input.keyboard.addKeys({
+    key_up: 'A',
+    key_down: 'down',
+    key_left: 'left',
+    key_right: 'right'
+});
 };
 
 //////////////////////////////////////////////////
@@ -134,11 +106,11 @@ gameScene.create = function() {
     });
 
     Phaser.Actions.ScaleXY(this.dragons.getChildren(), -0.5,-0.5);
-    //set speeds
+    //set dragon's speed
     var temp_dragons = this.dragons.getChildren()
     for (var i = 0; i < temp_dragons.length; i++) {
 	var dragonNumber = i;
-	temp_dragons[dragonNumber].speed = Math.random() * 2 + 1;
+	temp_dragons[dragonNumber].dragonSpeed = Math.random() * this.dragonSpeed + 1;
     }
     //set limits
     this.dragonsMaxY = 275;
@@ -155,7 +127,7 @@ gameScene.create = function() {
 //////////////////////////////////////////////////
 gameScene.gameOver = function() {
 
-    //fag to set player as dead
+    //fag to set player asp dead
     this.isPlayAlive = false;
     
     console.log("end of game");
@@ -170,7 +142,7 @@ gameScene.gameOver = function() {
     
     //restart game
     this.time.delayedCall(2000, function() {
-	this.scene.restart();
+	This.scene.restart();
     }, [], this);
     
 };
@@ -193,13 +165,13 @@ gameScene.update = function() {
     for (let i = 0; i < numDragons; i++) {
 
 	//move enemies
-	dragons[i].y += dragons[i].speed;
+	dragons[i].y += dragons[i].dragonSpeed;
 
 	//reverse movement if reached the
-	if (dragons[i].y >= this.dragonsMaxY && dragons[i].speed > 0) {
-	    dragons[i].speed *= -1; }
-	else if (dragons[i].y <= this.dragonsMinY && dragons[i].speed < 0) {
-	    dragons[i].speed *= -1;
+	if (dragons[i].y >= this.dragonsMaxY && dragons[i].dragonSpeed > 0) {
+	    dragons[i].dragonSpeed *= -1; }
+	else if (dragons[i].y <= this.dragonsMinY && dragons[i].dragonSpeed < 0) {
+	    dragons[i].dragonSpeed *= -1;
 
 	}
 	
@@ -210,17 +182,39 @@ gameScene.update = function() {
 	}
     }
 	   
+//if (this.input.activePointer.isDown) {
+//        // check for active input
+//  
+//      console.log('updating always the screen');
+//    // player walks
+//      this.player.x += this.playerSpeed;
+//  }
     
-  // check for active input
-  if (this.input.activePointer.isDown) {
-        // check for active input
-  
+    // check for active input
+    if(this.keys.key_up.isUp){
+       // check for active input
+          
       console.log('updating always the screen');
-    // player walks
-      this.player.x += this.playerSpeed;
-  }
+       // player walks
+	this.player.x += this.playerSpeed;
+    }
+			    
 // treasure collision
   if (Phaser.Geom.Intersects.RectangleToRectangle(this.player.getBounds(), this.treasure.getBounds())) {
     this.gameOver();
   }
 };
+
+
+
+////////////////////////////////////////
+// combine the game and menu into an executable object
+////////////////////////////////////////
+let config = {
+  type: Phaser.AUTO,  //Phaser will decide how to render our game (WebGL or Canvas)
+  width: 640, // game width
+  height: 360, // game height
+  scene:  [Menu, gameScene] // our newly created scene
+};
+
+let game = new Phaser.Game(config);
