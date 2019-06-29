@@ -1,8 +1,7 @@
 // - animate the character
-// - further interactions with dragons
-// - up and down movement
+// - further interactions with dragons ⤶ talking with dragon, killing dragon (range, distance between each dragon and the hero. for dragon loop.
+// if he is closer than 20 - kill deragon by pressing k (sqrt(x^2+y^2))
 // - door into a new scene
-// - difficulty selection
 
 //////////////////////////////////////////////////
 // creating the main menu
@@ -14,47 +13,48 @@ Menu.init = function(){
 
 //difficulty selection
 Menu.create = function(){
-
     this.add.text(270,50, 'Press 1, 2 or 3', {font: '16px Courier'});
 
     this.input.keyboard.once('keyup_ONE', function () {
 
         this.scene.start('Gamescene_Darren', {dragonSpeedMenu: 0.5});
+	alert('difficulty: easy');
+	
     }, this);
 
     this.input.keyboard.once('keyup_TWO', function () {
 
         this.scene.start('Gamescene_Darren', {dragonSpeedMenu: 1.5});
-	    
+	alert('difficulty: medium');
+	
     }, this);
 
     this.input.keyboard.once('keyup_THREE', function () {
 
         this.scene.start('Gamescene_Darren', {dragonSpeedMenu: 5});
-	    
+	console.log('difficulty: hard');
+	
     }, this);
     
 };
 
 ////////////////////////////////////////
-// creating game scence
+// creating game scene
 ////////////////////////////////////////
 let gameScene = new Phaser.Scene('Gamescene_Darren');
-
 gameScene.init = function(inputData) {
-    this.playerSpeed = 1.5;
+    this.playerSpeed = 1;
     this.dragonSpeed = inputData.dragonSpeedMenu;
     this.enemyMaxY = 280;
     this.enemyMinY = 80;
 
     this.keys = this.input.keyboard.addKeys({
-    key_up: 'A',
+    key_up: 'up',
     key_down: 'down',
     key_left: 'left',
     key_right: 'right'
 });
 };
-
 //////////////////////////////////////////////////
 // load asset files for our game
 //////////////////////////////////////////////////
@@ -72,8 +72,14 @@ gameScene.preload = function() {
 //////////////////////////////////////////////////
 // executed once, after assets were loaded
 //////////////////////////////////////////////////
-gameScene.create = function() {  
+gameScene.create = function() {
+    this.wKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
+    this.aKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
+    this.sKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);    
+    this.dKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
+    this.bKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.B);    
 
+    
     this.cameras.main.resetFX();
 
     
@@ -137,12 +143,15 @@ gameScene.gameOver = function() {
 
     //fade camera
     this.time.delayedCall(1000, function() {
+
+
+
 	this.cameras.main.fade(1000);
     }, [], this);
     
     //restart game
     this.time.delayedCall(2000, function() {
-	This.scene.restart();
+	this.scene.restart();
     }, [], this);
     
 };
@@ -158,10 +167,8 @@ gameScene.update = function() {
     
     //enemy movement
     let dragons = this.dragons.getChildren();
-    let numDragons = dragons.length;
+    let numDragons = dragons.length;   
 
-
-   
     for (let i = 0; i < numDragons; i++) {
 
 	//move enemies
@@ -181,24 +188,44 @@ gameScene.update = function() {
 	    break;
 	}
     }
-	   
-//if (this.input.activePointer.isDown) {
-//        // check for active input
-//  
-//      console.log('updating always the screen');
-//    // player walks
-//      this.player.x += this.playerSpeed;
-//  }
-    
-    // check for active input
-    if(this.keys.key_up.isUp){
-       // check for active input
-          
-      console.log('updating always the screen');
-       // player walks
+
+    if(this.bKey.isDown) {
+	console.log('B');
+    }
+    if(this.wKey.isDown) {
+	console.log('W');
+	this.player.y -= this.playerSpeed;
+    }
+    if(this.aKey.isDown) {
+	console.log('A');
+	this.player.x -= this.playerSpeed;
+    }
+    if(this.sKey.isDown) {
+	console.log('S');
+	this.player.y += this.playerSpeed;
+    }
+    if(this.dKey.isDown) {
+	console.log('D');
 	this.player.x += this.playerSpeed;
     }
-			    
+
+    // this.input.keyboard.on('keydown_RIGHT', function (event){
+    // 	//this.player.x += this.playerSpeed;
+    // 	console.log('right arroww');
+    // 	console.log(this.player.x);
+    // });
+    
+    // this.input.keyboard.on('keydown_LEFT', function (event){
+    // 	this.player.x -= this.playerSpeed; console.log('right arrow');
+    // 	}); this.input.keyboard.on('keydown_UP', function (event){
+    // 	this.player.y += this.playerSpeed; console.log('up'); });
+    // 	this.input.keyboard.on('keydown_DOWN', function (event){
+    // 	this.player.y -= this.playerSpeed; console.log('down'); });
+    
+    // // this.input.keyboard.on('keydown-rightArrow', callback,
+    // context); if(this.input.keyboard.on('keydown-rightArrow') {
+    // alert('rightArrow'); }
+    
 // treasure collision
   if (Phaser.Geom.Intersects.RectangleToRectangle(this.player.getBounds(), this.treasure.getBounds())) {
     this.gameOver();
@@ -218,3 +245,5 @@ let config = {
 };
 
 let game = new Phaser.Game(config);
+
+
